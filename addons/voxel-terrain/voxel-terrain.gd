@@ -13,7 +13,7 @@ var editing: WeakRef = weakref(null)
 
 func _enter_tree():
 	terrain_control = preload("res://addons/voxel-terrain/terrain-control.tscn").instantiate()
-	terrain_panel_button = add_control_to_bottom_panel(terrain_control, "Terrain Control")
+	terrain_panel_button = add_control_to_bottom_panel(terrain_control, "Terrain Editing")
 	
 	create_terrain_marker()
 	
