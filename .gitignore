@@ -5,3 +5,6 @@
 addons/voxel-terrain/bin/
 
 *.os
+.clangd
+.sconsign.dblite
+compile-flags.txt
