@@ -1,0 +1,8 @@
+[configuration]
+entry_symbol = "voxel_terrain_init"
+compatibility_minimum = "4.2"
+
+[libraries]
+windows.64 = "bin/voxel-terrain.windows.x86_64.dll"
+linux.64 = "bin/libvoxel-terrain.linux.x86_64.so"
+macos.64 = "bin/libtbloader.macos.universal.dylib"

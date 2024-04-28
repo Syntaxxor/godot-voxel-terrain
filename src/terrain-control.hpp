@@ -1,0 +1,55 @@
+#ifndef TERRAIN_CONTROL_H
+#define TERRAIN_CONTROL_H
+
+#include <gdextension_interface.h>
+#include <godot_cpp/classes/control.hpp>
+
+#include "voxel-terrain.hpp"
+
+
+using namespace godot;
+
+
+class TerrainControl : public Control {
+    GDCLASS(TerrainControl, Control)
+
+    private:
+    VoxelTerrain *terrain;
+    Vector3 target_location;
+    float size;
+    float strength;
+    float default_dist;
+
+    protected:
+    static void _bind_methods();
+
+    public:
+    TerrainControl();
+    ~TerrainControl();
+
+    /// Set the currently edited terrain.
+    void set_terrain(VoxelTerrain *terrain);
+    /// Get the currently edited terrain.
+    VoxelTerrain *get_terrain();
+
+    /// Set the location of the editing target.
+    void set_target_location(Vector3 target_location);
+    /// Get the location of the editing target.
+    Vector3 get_target_location() const;
+
+    /// Set the size of the current editing brush.
+    void set_size(float size);
+    /// Get the size of the current editing brush.
+    float get_size() const;
+
+    /// Set the size of the current editing brush.
+    void set_strength(float strength);
+    /// Get the size of the current editing brush.
+    float get_strength() const;
+
+    /// Update the location of the editing target.
+    void update_target_location(Vector3 r0, Vector3 rd);
+    void apply_edit();
+};
+
+#endif

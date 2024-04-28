@@ -1,0 +1,7 @@
+# Godot 4+ specific ignores
+.godot/
+
+.vscode/
+addons/voxel-terrain/bin/
+
+*.os

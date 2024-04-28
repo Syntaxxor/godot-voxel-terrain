@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://dng534qbm207f"]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="1_twxnv"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_cgty3"]
+radius = 0.2
+height = 1.0
+
+[node name="Player" type="CharacterBody3D"]
+floor_snap_length = 0.5
+script = ExtResource("1_twxnv")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_cgty3")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.40324, 0)
+
+[node name="SpotLight3D" type="SpotLight3D" parent="Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.026517, -0.0910732, 0)
+shadow_enabled = true
+spot_range = 15.0
+spot_angle = 39.8
+spot_angle_attenuation = 0.233258

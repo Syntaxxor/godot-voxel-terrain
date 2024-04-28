@@ -1,0 +1,3 @@
+-I./godot-cpp/include
+-I./godot-cpp/gen/include
+-I./godot-cpp/gdextension

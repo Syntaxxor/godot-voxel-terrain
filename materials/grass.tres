@@ -1,0 +1,14 @@
+[gd_resource type="StandardMaterial3D" load_steps=4 format=3 uid="uid://yafugaq71irt"]
+
+[ext_resource type="Texture2D" uid="uid://dmpeixi22igsf" path="res://textures/Grass_004_COLOR.jpg" id="1_lragm"]
+[ext_resource type="Texture2D" uid="uid://d3ygsfluh5vl0" path="res://textures/Grass_004_NORM.jpg" id="2_ol5pa"]
+[ext_resource type="Texture2D" uid="uid://h2s2o3nk5b43" path="res://textures/Grass_004_ROUGH.jpg" id="3_ha1hl"]
+
+[resource]
+albedo_texture = ExtResource("1_lragm")
+roughness_texture = ExtResource("3_ha1hl")
+normal_enabled = true
+normal_texture = ExtResource("2_ol5pa")
+uv1_scale = Vector3(0.4, 0.4, 0.4)
+uv1_triplanar = true
+uv1_triplanar_sharpness = 19.0273
