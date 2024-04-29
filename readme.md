@@ -23,7 +23,7 @@ The strength slider goes from -1.0 to 1.0, from left to right.
 
 Currently, there is only a terrain sculpting tool. This creates or destroys terrain based on the tool strength.
 
-Hotkeys:
+### Hotkeys:
 - Ctrl+Scroll to change tool strength.
 - Alt+Scroll to change tool size.
 
