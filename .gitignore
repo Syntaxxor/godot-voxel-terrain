@@ -3,8 +3,10 @@
 
 .vscode/
 addons/voxel-terrain/bin/
+staging/
 
 *.os
 .clangd
 .sconsign.dblite
 compile_flags.txt
+voxel-terrain.zip
