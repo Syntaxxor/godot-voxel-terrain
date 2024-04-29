@@ -23,7 +23,7 @@ The strength slider goes from -1.0 to 1.0, from left to right.
 
 Currently, there is only a terrain sculpting tool. This creates or destroys terrain based on the tool strength.
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/EP3kMirR4jc?si=I5DP2JmRvsBbPHae" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[Video Tutorial](https://www.youtube.com/watch?v=EP3kMirR4jc)
 
 ### Hotkeys:
 - Ctrl+Scroll to change tool strength.
