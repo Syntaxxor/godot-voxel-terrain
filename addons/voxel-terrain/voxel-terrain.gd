@@ -72,11 +72,11 @@ func _forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent):
 			if Input.is_key_pressed(KEY_ALT):
 				if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 					if event.pressed:
-						terrain_control.set_size(terrain_control.get_size() - 1)
+						terrain_control.update_size(terrain_control.get_size() - 1)
 					return EditorPlugin.AFTER_GUI_INPUT_STOP
 				if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 					if event.pressed:
-						terrain_control.set_size(terrain_control.get_size() + 1)
+						terrain_control.update_size(terrain_control.get_size() + 1)
 					return EditorPlugin.AFTER_GUI_INPUT_STOP
 			# Use ctrl+scroll to change the strength of the edit tool.
 			if Input.is_key_pressed(KEY_CTRL):

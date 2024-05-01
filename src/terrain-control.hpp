@@ -10,11 +10,21 @@
 using namespace godot;
 
 
+const uint32_t SHAPE_SPHERE = 0;
+const uint32_t SHAPE_CUBE = 1;
+
+enum EditShape {
+    SPHERE,
+    CUBE
+};
+
+
 class TerrainControl : public Control {
     GDCLASS(TerrainControl, Control)
 
     private:
     VoxelTerrain *terrain;
+    uint32_t edit_shape;
     Vector3 target_location;
     float size;
     float strength;
@@ -31,6 +41,9 @@ class TerrainControl : public Control {
     void set_terrain(VoxelTerrain *terrain);
     /// Get the currently edited terrain.
     VoxelTerrain *get_terrain();
+
+    void set_edit_shape(uint32_t edit_shape);
+    uint32_t get_edit_shape() const;
 
     /// Set the location of the editing target.
     void set_target_location(Vector3 target_location);
@@ -49,6 +62,7 @@ class TerrainControl : public Control {
 
     /// Update the location of the editing target.
     void update_target_location(Vector3 r0, Vector3 rd);
+    float get_weight_at(Vector3i off);
     void apply_edit();
 };
 

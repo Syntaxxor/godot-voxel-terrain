@@ -11,6 +11,9 @@ void TerrainControl::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_terrain", "terrain"), &TerrainControl::set_terrain);
     ClassDB::bind_method(D_METHOD("get_terrain"), &TerrainControl::get_terrain);
 
+    ClassDB::bind_method(D_METHOD("set_edit_shape", "edit_shape"), &TerrainControl::set_edit_shape);
+    ClassDB::bind_method(D_METHOD("get_edit_shape"), &TerrainControl::get_edit_shape);
+
     ClassDB::bind_method(D_METHOD("set_target_location", "target_location"), &TerrainControl::set_target_location);
     ClassDB::bind_method(D_METHOD("get_target_location"), &TerrainControl::get_target_location);
 
@@ -21,9 +24,11 @@ void TerrainControl::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_strength"), &TerrainControl::get_strength);
 
     ClassDB::bind_method(D_METHOD("update_target_location", "r0", "rd"), &TerrainControl::update_target_location);
+    ClassDB::bind_method(D_METHOD("get_weight_at", "off"), &TerrainControl::get_weight_at);
     ClassDB::bind_method(D_METHOD("apply_edit"), &TerrainControl::apply_edit);
 
-    ADD_SIGNAL(MethodInfo("size_changed", PropertyInfo(Variant::FLOAT, "new_size")));
+    BIND_CONSTANT(SHAPE_SPHERE);
+    BIND_CONSTANT(SHAPE_CUBE);
 }
 
 
@@ -50,6 +55,15 @@ VoxelTerrain *TerrainControl::get_terrain() {
 }
 
 
+void TerrainControl::set_edit_shape(uint32_t edit_shape) {
+    this->edit_shape = edit_shape;
+}
+
+uint32_t TerrainControl::get_edit_shape() const {
+    return edit_shape;
+}
+
+
 void TerrainControl::set_target_location(Vector3 target_location) {
     this->target_location = target_location;
 }
@@ -62,7 +76,6 @@ Vector3 TerrainControl::get_target_location() const {
 void TerrainControl::set_size(float size) {
     if(size > 0.0){
         this->size = size;
-        emit_signal("size_changed", size);
     }
 }
 
@@ -102,19 +115,30 @@ void TerrainControl::update_target_location(Vector3 r0, Vector3 rd) {
     }
 }
 
+float TerrainControl::get_weight_at(Vector3i off) {
+    if(edit_shape == SHAPE_SPHERE) {
+        if(off.length() >= size) {
+            return 0.0;
+        }
+        return (size - off.length()) / size;
+    } else if(edit_shape == SHAPE_CUBE) {
+        int min = Math::min(off.x, Math::min(off.y, off.z));
+        return (size - min) / size;
+    }
+    return 0.0;
+}
+
 void TerrainControl::apply_edit() {
     // Use to_local to make sure the terrain can be translated/scaled/rotated and remain consistent.
     Vector3 edit_location = terrain->to_local(target_location);
     Vector3i voxel_location = static_cast<Vector3i>(edit_location);
     // Iterate over our size.
-    for(int z = -size; z < size; z++) {
-        for(int y = -size; y < size; y++) {
-            for(int x = -size; x < size; x++) {
+    for(int z = -size; z <= size; z++) {
+        for(int y = -size; y <= size; y++) {
+            for(int x = -size; x <= size; x++) {
                 Vector3i off = Vector3i(x, y, z);
-                // Currently, we are only using a sphere shape.
-                // In the future, this needs to be changed to support different shapes and weight distributions.
-                if(off.length() < size){
-                    float weight = (size - off.length()) / size;
+                float weight = get_weight_at(off);
+                if(weight != 0.0) {
                     int32_t cur = terrain->get_voxel(voxel_location + off);
                     cur += (weight * strength) * 255;
                     cur = Math::clamp(cur, 0, 255);
