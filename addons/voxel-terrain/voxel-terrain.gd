@@ -7,6 +7,8 @@ var terrain_panel_button: Button = null
 
 var terrain_marker: RID = RID()
 var terrain_marker_mesh: Mesh = null
+var terrain_marker_sphere: SphereMesh = null
+var terrain_marker_box: BoxMesh = null
 
 var editing: WeakRef = weakref(null)
 
@@ -20,6 +22,8 @@ func _enter_tree():
 	terrain_control.visibility_changed.connect(update_marker_visibility)
 	
 	terrain_panel_button.visible = false
+	
+	terrain_control.edit_shape_changed.connect(update_marker_shape)
 
 
 func _exit_tree():
@@ -93,16 +97,28 @@ func _forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent):
 
 func create_terrain_marker():
 	# This is just a simple RenderingServer terrain marker.
-	terrain_marker_mesh = SphereMesh.new()
-	terrain_marker_mesh.material = load("res://addons/voxel-terrain/materials/marker_material.tres")
-	terrain_marker_mesh.radius = 1.0
-	terrain_marker_mesh.height = 2.0
+	terrain_marker_sphere = SphereMesh.new()
+	terrain_marker_sphere.material = load("res://addons/voxel-terrain/materials/marker_material.tres")
+	terrain_marker_sphere.radius = 1.0
+	terrain_marker_sphere.height = 2.0
+	
+	terrain_marker_box = BoxMesh.new()
+	terrain_marker_box.material = load("res://addons/voxel-terrain/materials/marker_material.tres")
+	terrain_marker_box.size = Vector3(2.0, 2.0, 2.0)
 	
 	terrain_marker = RenderingServer.instance_create()
-	RenderingServer.instance_set_base(terrain_marker, terrain_marker_mesh)
+	RenderingServer.instance_set_base(terrain_marker, terrain_marker_sphere)
 	RenderingServer.instance_set_visible(terrain_marker, false)
 
 
 func update_marker_visibility():
 	RenderingServer.instance_set_visible(terrain_marker, terrain_control.is_visible_in_tree())
 	print("Visible: " + str(terrain_control.is_visible_in_tree()))
+
+
+func update_marker_shape():
+	match terrain_control.get_edit_shape():
+		TerrainControl.SHAPE_SPHERE:
+			RenderingServer.instance_set_base(terrain_marker, terrain_marker_sphere)
+		TerrainControl.SHAPE_BOX:
+			RenderingServer.instance_set_base(terrain_marker, terrain_marker_box)

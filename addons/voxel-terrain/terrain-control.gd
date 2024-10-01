@@ -4,8 +4,8 @@
 extends TerrainControl
 
 
-@onready var size_box = $PanelContainer/FlowContainer/SizeBox
-@onready var strength_slider = $PanelContainer/FlowContainer/StrengthSlider
+@onready var size_box = $PanelContainer/HBoxContainer/ToolSettings/SizeBox
+@onready var strength_slider = $PanelContainer/HBoxContainer/ToolSettings/StrengthSlider
 
 
 # Called when the node enters the scene tree for the first time.

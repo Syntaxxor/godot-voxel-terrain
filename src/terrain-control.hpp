@@ -11,11 +11,11 @@ using namespace godot;
 
 
 const uint32_t SHAPE_SPHERE = 0;
-const uint32_t SHAPE_CUBE = 1;
+const uint32_t SHAPE_BOX = 1;
 
 enum EditShape {
-    SPHERE,
-    CUBE
+    SPHERE = SHAPE_SPHERE,
+    BOX = SHAPE_BOX
 };
 
 

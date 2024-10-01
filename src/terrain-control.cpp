@@ -27,8 +27,10 @@ void TerrainControl::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_weight_at", "off"), &TerrainControl::get_weight_at);
     ClassDB::bind_method(D_METHOD("apply_edit"), &TerrainControl::apply_edit);
 
+    ADD_SIGNAL(MethodInfo("edit_shape_changed"));
+
     BIND_CONSTANT(SHAPE_SPHERE);
-    BIND_CONSTANT(SHAPE_CUBE);
+    BIND_CONSTANT(SHAPE_BOX);
 }
 
 
@@ -57,6 +59,7 @@ VoxelTerrain *TerrainControl::get_terrain() {
 
 void TerrainControl::set_edit_shape(uint32_t edit_shape) {
     this->edit_shape = edit_shape;
+    emit_signal("edit_shape_changed");
 }
 
 uint32_t TerrainControl::get_edit_shape() const {
@@ -121,7 +124,7 @@ float TerrainControl::get_weight_at(Vector3i off) {
             return 0.0;
         }
         return (size - off.length()) / size;
-    } else if(edit_shape == SHAPE_CUBE) {
+    } else if(edit_shape == SHAPE_BOX) {
         int min = Math::min(off.x, Math::min(off.y, off.z));
         return (size - min) / size;
     }
