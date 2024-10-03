@@ -9,6 +9,7 @@ var terrain_marker: RID = RID()
 var terrain_marker_mesh: Mesh = null
 var terrain_marker_sphere: SphereMesh = null
 var terrain_marker_box: BoxMesh = null
+var terrain_marker_cylinder: CylinderMesh = null
 
 var editing: WeakRef = weakref(null)
 
@@ -106,6 +107,13 @@ func create_terrain_marker():
 	terrain_marker_box.material = load("res://addons/voxel-terrain/materials/marker_material.tres")
 	terrain_marker_box.size = Vector3(2.0, 2.0, 2.0)
 	
+	terrain_marker_cylinder = CylinderMesh.new();
+	terrain_marker_cylinder.material = load("res://addons/voxel-terrain/materials/marker_material.tres")
+	terrain_marker_cylinder.height = 2.0
+	terrain_marker_cylinder.bottom_radius = 1.0
+	terrain_marker_cylinder.top_radius = 1.0
+	
+	
 	terrain_marker = RenderingServer.instance_create()
 	RenderingServer.instance_set_base(terrain_marker, terrain_marker_sphere)
 	RenderingServer.instance_set_visible(terrain_marker, false)
@@ -122,3 +130,5 @@ func update_marker_shape():
 			RenderingServer.instance_set_base(terrain_marker, terrain_marker_sphere)
 		TerrainControl.SHAPE_BOX:
 			RenderingServer.instance_set_base(terrain_marker, terrain_marker_box)
+		TerrainControl.SHAPE_CYLINDER:
+			RenderingServer.instance_set_base(terrain_marker, terrain_marker_cylinder)

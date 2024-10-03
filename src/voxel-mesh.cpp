@@ -15,6 +15,7 @@ void VoxelMesh::_bind_methods() {
     ClassDB::bind_method(D_METHOD("update_mesh", "terrain"), &VoxelMesh::update_mesh);
     ClassDB::bind_method(D_METHOD("set_mesh_material", "material"), &VoxelMesh::set_mesh_material);
     ClassDB::bind_method(D_METHOD("update_collision"), &VoxelMesh::update_collision);
+    ClassDB::bind_method(D_METHOD("is_update_ready"), &VoxelMesh::is_update_ready);
 }
 
 
@@ -56,6 +57,7 @@ void add_quad(PackedInt32Array &indices, int32_t a, int32_t b, int32_t c, int32_
 /// NOTE: Much of this algorithm is directly pulled from my past attempts using GDScript
 /// It's more of a port than anything, so if it's bad, well... RIP I guess.
 void VoxelMesh::update_mesh(VoxelTerrain *terrain) {
+    collision_generated = false;
     // Edge pairs that can be checked.
     const int32_t E0[12] = {0, 2, 4, 6, 0, 1, 4, 5, 0, 1, 2, 3};
     const int32_t E1[12] = {1, 3, 5, 7, 2, 3, 6, 7, 4, 5, 6, 7};
@@ -76,7 +78,6 @@ void VoxelMesh::update_mesh(VoxelTerrain *terrain) {
     PackedVector3Array vertices = PackedVector3Array();
     PackedVector3Array normals = PackedVector3Array();
     PackedInt32Array indices = PackedInt32Array();
-    PackedVector3Array collision_faces = PackedVector3Array();
 
     // The index of each cell is stored in here.
     std::map<Vector3i, uint16_t> cell_indices = std::map<Vector3i, uint16_t>();
@@ -224,12 +225,15 @@ void VoxelMesh::update_mesh(VoxelTerrain *terrain) {
         array_mesh->add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLES, surface_arrays);
         call_deferred("set_mesh", array_mesh);
 
+        PackedVector3Array collision_faces = PackedVector3Array();
+        collision_faces.resize(indices.size());
+
         // Generate our collision faces.
-        collision_generated = false;
         for(int i = 0; i < indices.size(); i++) {
-            collision_faces.push_back(vertices[indices[i]]);
+            collision_faces[i] = vertices[indices[i]];
         }
-        call_deferred("update_collision", collision_faces);
+        update_collision(collision_faces);
+        //call_deferred("update_collision", collision_faces);
     }
 
     set_mesh_material(terrain->get_terrain_material());
@@ -248,13 +252,21 @@ void VoxelMesh::update_collision(PackedVector3Array collision_faces) {
     if(!col_shape) {
         StaticBody3D *body = memnew(StaticBody3D);
         col_shape = memnew(CollisionShape3D);
-        add_child(body);
-        body->add_child(col_shape);
+        trimesh_shape = memnew(ConcavePolygonShape3D);
+        call_deferred("add_child", body);
+        //add_child(body);
+        body->call_deferred("add_child", col_shape);
+        //body->add_child(col_shape);
+        col_shape->call_deferred("set_shape", trimesh_shape);
     }
 
-    ConcavePolygonShape3D *trimesh_shape = memnew(ConcavePolygonShape3D);
-    trimesh_shape->set_faces(collision_faces);
-
-    col_shape->set_shape(trimesh_shape);
+    trimesh_shape->call_deferred("set_faces", collision_faces);
+    //trimesh_shape->set_faces(collision_faces);
+    //col_shape->set_shape(trimesh_shape);
     collision_generated = true;
+}
+
+
+bool VoxelMesh::is_update_ready() {
+    return this->collision_generated;
 }

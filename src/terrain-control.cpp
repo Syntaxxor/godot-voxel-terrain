@@ -14,6 +14,9 @@ void TerrainControl::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_edit_shape", "edit_shape"), &TerrainControl::set_edit_shape);
     ClassDB::bind_method(D_METHOD("get_edit_shape"), &TerrainControl::get_edit_shape);
 
+    ClassDB::bind_method(D_METHOD("set_edit_tool", "edit_tool"), &TerrainControl::set_edit_tool);
+    ClassDB::bind_method(D_METHOD("get_edit_tool"), &TerrainControl::get_edit_tool);
+
     ClassDB::bind_method(D_METHOD("set_target_location", "target_location"), &TerrainControl::set_target_location);
     ClassDB::bind_method(D_METHOD("get_target_location"), &TerrainControl::get_target_location);
 
@@ -31,6 +34,7 @@ void TerrainControl::_bind_methods() {
 
     BIND_CONSTANT(SHAPE_SPHERE);
     BIND_CONSTANT(SHAPE_BOX);
+    BIND_CONSTANT(SHAPE_CYLINDER);
 }
 
 
@@ -40,6 +44,8 @@ TerrainControl::TerrainControl() {
     size = 4.0;
     strength = 0;
     default_dist = 10.0;
+    edit_shape = 0;
+    edit_tool = 0;
 }
 
 
@@ -64,6 +70,16 @@ void TerrainControl::set_edit_shape(uint32_t edit_shape) {
 
 uint32_t TerrainControl::get_edit_shape() const {
     return edit_shape;
+}
+
+
+void TerrainControl::set_edit_tool(uint32_t edit_tool) {
+    this->edit_tool = edit_tool;
+    UtilityFunctions::print(edit_tool);
+}
+
+uint32_t TerrainControl::get_edit_tool() const {
+    return edit_tool;
 }
 
 
@@ -127,6 +143,12 @@ float TerrainControl::get_weight_at(Vector3i off) {
     } else if(edit_shape == SHAPE_BOX) {
         int min = Math::min(off.x, Math::min(off.y, off.z));
         return (size - min) / size;
+    } else if(edit_shape == SHAPE_CYLINDER) {
+        Vector3i c_off = Vector3i(off.x, 0.0, off.z);
+        if(c_off.length() >= size) {
+            return 0.0;
+        }
+        return (size - c_off.length()) / size;
     }
     return 0.0;
 }
@@ -142,13 +164,85 @@ void TerrainControl::apply_edit() {
                 Vector3i off = Vector3i(x, y, z);
                 float weight = get_weight_at(off);
                 if(weight != 0.0) {
-                    int32_t cur = terrain->get_voxel(voxel_location + off);
-                    cur += (weight * strength) * 255;
-                    cur = Math::clamp(cur, 0, 255);
-                    terrain->set_voxel(voxel_location + off, cur);
+                    if(edit_tool == TOOL_DRAW) {
+                        edit_draw(voxel_location + off, weight * strength);
+                    } else if(edit_tool == TOOL_SCULPT) {
+                        edit_sculpt(voxel_location + off, weight * strength);
+                    } else if(edit_tool == TOOL_SMOOTH) {
+                        edit_smooth(voxel_location + off, weight * strength);
+                    }
                 }
             }
         }
     }
+}
 
+void TerrainControl::edit_draw(Vector3i location, float weight) {
+    int32_t cur = terrain->get_voxel(location);
+    cur += weight * 255;
+    cur = Math::clamp(cur, 0, 255);
+    terrain->set_voxel(location, cur);
+}
+
+void TerrainControl::edit_sculpt(Vector3i location, float weight) {
+    int32_t cur = terrain->get_voxel(location);
+    bool should_sculpt = false;
+    if(weight > 0.0) {
+        if(cur > 127) {
+            should_sculpt = true;
+        } else {
+            // Check surrounding voxels
+            for(int x = -1; x <= 1; x++) {
+                for(int y = -1; y <= 1; y++) {
+                    for(int z = -1; z <= 1; z++) {
+                        if(terrain->get_voxel(location + Vector3i(x, y, z)) == 255) {
+                            should_sculpt = true;
+                            goto do_sculpting;
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        if(cur < 128) {
+            should_sculpt = true;
+        } else {
+            // Check surrounding voxels
+            for(int x = -1; x <= 1; x++) {
+                for(int y = -1; y <= 1; y++) {
+                    for(int z = -1; z <= 1; z++) {
+                        if(terrain->get_voxel(location + Vector3i(x, y, z)) == 0) {
+                            should_sculpt = true;
+                            goto do_sculpting;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    do_sculpting:
+    if(should_sculpt) {
+        cur += weight * 255;
+        cur = Math::clamp(cur, 0, 255);
+        terrain->set_voxel(location, cur);
+    }
+}
+
+
+void TerrainControl::edit_smooth(Vector3i location, float weight) {
+    int32_t average = 0;
+    for(int x = -1; x <= 1; x++) {
+        for(int y = -1; y <= 1; y++) {
+            for(int z = -1; z <= 1; z++) {
+                if(x != 0 || y != 0 || z != 0){
+                    average += terrain->get_voxel(location + Vector3i(x, y, z));
+                }
+            }
+        }
+    }
+    average /= 26;
+    int32_t cur = terrain->get_voxel(location);
+    cur = Math::move_toward(cur, average, weight);
+    cur = Math::clamp(cur, 0, 255);
+    terrain->set_voxel(location, cur);
 }

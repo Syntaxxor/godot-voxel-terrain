@@ -20,6 +20,7 @@ class VoxelMesh : public MeshInstance3D {
     Vector3i chunk_position;
     bool collision_generated;
     CollisionShape3D *col_shape;
+    ConcavePolygonShape3D *trimesh_shape;
 
     protected:
     static void _bind_methods();
@@ -36,6 +37,7 @@ class VoxelMesh : public MeshInstance3D {
     void update_mesh(VoxelTerrain *terrain);
     void set_mesh_material(Ref<Material> material);
     void update_collision(PackedVector3Array collision_faces);
+    bool is_update_ready();
 };
 
 #endif
