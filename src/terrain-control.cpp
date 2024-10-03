@@ -156,7 +156,7 @@ float TerrainControl::get_weight_at(Vector3i off) {
             return 0.0;
         }
         float height_off = off.y + size;
-        return ((size - c_off.length()) / size) * (1.0 - height_off / (size * 2.0f));
+        return Math::clamp((size - c_off.length()) / size - (height_off / (size * 2.0f)), 0.0, 1.0);
     }
     return 0.0;
 }
@@ -171,7 +171,7 @@ void TerrainControl::apply_edit() {
             for(int x = -size; x <= size; x++) {
                 Vector3i off = Vector3i(x, y, z);
                 float weight = get_weight_at(off);
-                if(weight != 0.0) {
+                if(weight > 0.0) {
                     if(edit_tool == TOOL_DRAW) {
                         edit_draw(voxel_location + off, weight * strength);
                     } else if(edit_tool == TOOL_SCULPT) {
