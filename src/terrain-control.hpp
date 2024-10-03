@@ -13,6 +13,7 @@ using namespace godot;
 const uint32_t SHAPE_SPHERE = 0;
 const uint32_t SHAPE_BOX = 1;
 const uint32_t SHAPE_CYLINDER = 2;
+const uint32_t SHAPE_CONE = 3;
 
 const uint32_t TOOL_DRAW = 0;
 const uint32_t TOOL_SCULPT = 1;

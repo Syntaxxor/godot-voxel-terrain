@@ -35,6 +35,7 @@ void TerrainControl::_bind_methods() {
     BIND_CONSTANT(SHAPE_SPHERE);
     BIND_CONSTANT(SHAPE_BOX);
     BIND_CONSTANT(SHAPE_CYLINDER);
+    BIND_CONSTANT(SHAPE_CONE);
 }
 
 
@@ -149,6 +150,13 @@ float TerrainControl::get_weight_at(Vector3i off) {
             return 0.0;
         }
         return (size - c_off.length()) / size;
+    } else if (edit_shape == SHAPE_CONE) {
+        Vector3i c_off = Vector3i(off.x, 0.0, off.z);
+        if(c_off.length() >= size) {
+            return 0.0;
+        }
+        float height_off = off.y + size;
+        return ((size - c_off.length()) / size) * (1.0 - height_off / (size * 2.0f));
     }
     return 0.0;
 }

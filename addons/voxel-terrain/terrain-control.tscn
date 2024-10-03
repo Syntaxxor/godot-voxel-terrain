@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://crdtp8g85vgol"]
+[gd_scene load_steps=11 format=3 uid="uid://crdtp8g85vgol"]
 
 [ext_resource type="Script" path="res://addons/voxel-terrain/terrain-control.gd" id="1_p5ifm"]
 [ext_resource type="Texture2D" uid="uid://dvqrh1fjv7tf1" path="res://addons/voxel-terrain/textures/Sphere.png" id="2_vu6om"]
@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://vblcx427g3os" path="res://addons/voxel-terrain/textures/Cube-Pressed.png" id="5_l88ge"]
 [ext_resource type="Texture2D" uid="uid://cegi6wji0nn6v" path="res://addons/voxel-terrain/textures/Cylinder.png" id="6_u2b6j"]
 [ext_resource type="Texture2D" uid="uid://c64fv6tlun4w" path="res://addons/voxel-terrain/textures/Cylinder-Pressed.png" id="7_d1txm"]
+[ext_resource type="Texture2D" uid="uid://4dctq5axu5rb" path="res://addons/voxel-terrain/textures/Cone.png" id="8_s28of"]
+[ext_resource type="Texture2D" uid="uid://b52ruhph12x02" path="res://addons/voxel-terrain/textures/Cone-Pressed.png" id="9_vlql1"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_xy3ex"]
 
@@ -57,6 +59,13 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_xy3ex")
 texture_normal = ExtResource("6_u2b6j")
 texture_pressed = ExtResource("7_d1txm")
+
+[node name="ConeButton" type="TextureButton" parent="PanelContainer/HBoxContainer/ShapeSelection"]
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_xy3ex")
+texture_normal = ExtResource("8_s28of")
+texture_pressed = ExtResource("9_vlql1")
 
 [node name="VSeparator" type="VSeparator" parent="PanelContainer/HBoxContainer"]
 layout_mode = 2
@@ -117,6 +126,7 @@ theme_override_constants/separation = 32
 [connection signal="pressed" from="PanelContainer/HBoxContainer/ShapeSelection/SphereButton" to="." method="set_edit_shape" binds= [0]]
 [connection signal="pressed" from="PanelContainer/HBoxContainer/ShapeSelection/CubeButton" to="." method="set_edit_shape" binds= [1]]
 [connection signal="pressed" from="PanelContainer/HBoxContainer/ShapeSelection/CylinderButton" to="." method="set_edit_shape" binds= [2]]
+[connection signal="pressed" from="PanelContainer/HBoxContainer/ShapeSelection/ConeButton" to="." method="set_edit_shape" binds= [3]]
 [connection signal="item_selected" from="PanelContainer/HBoxContainer/ToolSettings/OptionButton" to="." method="set_edit_tool"]
 [connection signal="value_changed" from="PanelContainer/HBoxContainer/ToolSettings/SizeBox" to="." method="set_size"]
 [connection signal="value_changed" from="PanelContainer/HBoxContainer/ToolSettings/StrengthSlider" to="." method="set_strength"]
