@@ -142,8 +142,9 @@ float TerrainControl::get_weight_at(Vector3i off) {
         }
         return (size - off.length()) / size;
     } else if(edit_shape == SHAPE_BOX) {
-        int min = Math::min(off.x, Math::min(off.y, off.z));
-        return (size - min) / size;
+        off = off.abs();
+        int max = Math::max(off.x, Math::max(off.y, off.z));
+        return (size - max) / size;
     } else if(edit_shape == SHAPE_CYLINDER) {
         Vector3i c_off = Vector3i(off.x, 0.0, off.z);
         if(c_off.length() >= size) {
@@ -195,6 +196,7 @@ void TerrainControl::edit_draw(Vector3i location, float weight) {
 void TerrainControl::edit_sculpt(Vector3i location, float weight) {
     int32_t cur = terrain->get_voxel(location);
     bool should_sculpt = false;
+    int32_t change_amount = weight * 255;
     if(weight > 0.0) {
         if(cur > 127) {
             should_sculpt = true;
@@ -203,7 +205,7 @@ void TerrainControl::edit_sculpt(Vector3i location, float weight) {
             for(int x = -1; x <= 1; x++) {
                 for(int y = -1; y <= 1; y++) {
                     for(int z = -1; z <= 1; z++) {
-                        if(terrain->get_voxel(location + Vector3i(x, y, z)) == 255) {
+                        if(terrain->get_voxel(location + Vector3i(x, y, z)) > 255 - change_amount) {
                             should_sculpt = true;
                             goto do_sculpting;
                         }
@@ -230,7 +232,7 @@ void TerrainControl::edit_sculpt(Vector3i location, float weight) {
     }
     do_sculpting:
     if(should_sculpt) {
-        cur += weight * 255;
+        cur += change_amount;
         cur = Math::clamp(cur, 0, 255);
         terrain->set_voxel(location, cur);
     }
@@ -239,16 +241,13 @@ void TerrainControl::edit_sculpt(Vector3i location, float weight) {
 
 void TerrainControl::edit_smooth(Vector3i location, float weight) {
     int32_t average = 0;
-    for(int x = -1; x <= 1; x++) {
-        for(int y = -1; y <= 1; y++) {
-            for(int z = -1; z <= 1; z++) {
-                if(x != 0 || y != 0 || z != 0){
-                    average += terrain->get_voxel(location + Vector3i(x, y, z));
-                }
-            }
-        }
-    }
-    average /= 26;
+    average += terrain->get_voxel(location + Vector3i(-1, 0, 0));
+    average += terrain->get_voxel(location + Vector3i(1, 0, 0));
+    average += terrain->get_voxel(location + Vector3i(0, -1, 0));
+    average += terrain->get_voxel(location + Vector3i(0, 1, 0));
+    average += terrain->get_voxel(location + Vector3i(0, 0, -1));
+    average += terrain->get_voxel(location + Vector3i(0, 0, 1));
+    average /= 5; // NOTE: This is not technically a correct average. However, in testing, I've found this makes it feel better to use.
     int32_t cur = terrain->get_voxel(location);
     cur = Math::move_toward(cur, average, weight);
     cur = Math::clamp(cur, 0, 255);
